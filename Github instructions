@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub: Repos & Interactives</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e2e1d9; max-width: 640px; width: 100%; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .header { margin-bottom: 24px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #1a1a18; margin-bottom: 4px; }
+  .header p { font-size: 13px; color: #73726c; }
+  .progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .progress-bar { flex: 1; height: 4px; background: #e2e1d9; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #1a1a18; border-radius: 2px; transition: width 0.35s ease; }
+  .step-counter { font-size: 12px; color: #888780; white-space: nowrap; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+  .pill { padding: 4px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #d3d1c7; color: #73726c; background: #fff; cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .pill.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .pill:hover:not(.active) { background: #f1efe8; }
+  .step { display: none; }
+  .step.visible { display: block; }
+  .step h2 { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: #1a1a18; }
+  .step .sub { font-size: 13px; color: #73726c; margin-bottom: 16px; line-height: 1.5; }
+  ol { padding-left: 20px; margin-bottom: 12px; }
+  ol li { font-size: 14px; color: #444441; line-height: 2; }
+  ol li strong { color: #1a1a18; font-weight: 500; }
+  .tip { border-left: 2px solid #b5d4f4; background: #e6f1fb; border-radius: 0 8px 8px 0; padding: 9px 13px; font-size: 13px; color: #185fa5; margin: 10px 0; line-height: 1.5; }
+  .code-block { position: relative; background: #f1efe8; border: 1px solid #d3d1c7; border-radius: 8px; padding: 12px 14px; font-family: "SF Mono", "Fira Mono", monospace; font-size: 12.5px; color: #1a1a18; margin: 8px 0; white-space: pre; overflow-x: auto; }
+  .code-block .comment { color: #888780; }
+  .copy-btn { position: absolute; top: 8px; right: 8px; font-size: 11px; padding: 3px 8px; border-radius: 5px; border: 1px solid #d3d1c7; background: #fff; color: #73726c; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .copy-btn:hover { background: #f1efe8; }
+  .file-tree { background: #f1efe8; border: 1px solid #d3d1c7; border-radius: 8px; padding: 12px 14px; font-family: "SF Mono", "Fira Mono", monospace; font-size: 12.5px; line-height: 1.9; margin: 10px 0; }
+  .file-tree .dir { color: #185fa5; }
+  .file-tree .cmnt { color: #888780; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .badge-green { background: #eaf3de; color: #3b6d11; }
+  .badge-blue { background: #e6f1fb; color: #185fa5; }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e1d9; }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #d3d1c7; cursor: pointer; transition: background 0.2s; }
+  .dot.active { background: #1a1a18; }
+  .btn { padding: 7px 18px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; border: 1px solid #d3d1c7; background: #fff; color: #444441; transition: all 0.15s; }
+  .btn:hover:not(:disabled) { background: #f1efe8; }
+  .btn.primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .btn.primary:hover:not(:disabled) { background: #333330; }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  code { font-family: "SF Mono", "Fira Mono", monospace; font-size: 11.5px; background: #f1efe8; padding: 1px 5px; border-radius: 4px; color: #1a1a18; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>GitHub: repos &amp; interactives</h1>
+    <p>A step-by-step guide for course authors</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:16.6%"></div></div>
+    <div class="step-counter" id="ctr">Step 1 of 6</div>
+  </div>
+
+  <div class="pills" id="pills"></div>
+
+  <!-- Step 1 -->
+  <div class="step visible" id="s0">
+    <h2>Create a GitHub account</h2>
+    <p class="sub">If you already have one, skip ahead to step 2.</p>
+    <ol>
+      <li>Go to <strong>github.com</strong> and click <strong>Sign up</strong></li>
+      <li>Choose a username, email, and password</li>
+      <li>Verify your email address</li>
+      <li>Select the <strong>Free</strong> plan</li>
+    </ol>
+    <div class="tip">Your username becomes part of your URL: <code>github.com/your-username</code></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="s1">
+    <h2>Create a new repository</h2>
+    <p class="sub">A repository (repo) is a hosted folder for your project.</p>
+    <ol>
+      <li>Click the <strong>+</strong> icon → <strong>New repository</strong></li>
+      <li>Name your repo (e.g. <code>my-interactives</code>)</li>
+      <li>Set visibility to <span class="badge badge-green">Public</span> — required for free Pages hosting</li>
+      <li>Check <strong>Add a README file</strong></li>
+      <li>Click <strong>Create repository</strong></li>
+    </ol>
+    <div class="tip">A public repo lets GitHub host your files free at <code>username.github.io/repo-name</code></div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="s2">
+    <h2>Clone the repo to your computer</h2>
+    <p class="sub">Download the repo so you can add files locally. You'll need <strong>Git</strong> installed.</p>
+    <div class="code-block">git clone https://github.com/YOUR-USERNAME/my-interactives.git
+cd my-interactives<button class="copy-btn" onclick="cp(this,'git clone https://github.com/YOUR-USERNAME/my-interactives.git\ncd my-interactives')">Copy</button></div>
+    <div class="tip">No terminal? Use <strong>GitHub Desktop</strong> (desktop.github.com) for a point-and-click alternative.</div>
+    <p style="font-size:13px;color:#73726c;margin-top:12px;">After cloning, your folder looks like:</p>
+    <div class="file-tree"><span class="dir">my-interactives/</span>
+  README.md <span class="cmnt">← auto-created</span></div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" id="s3">
+    <h2>Add your interactive files</h2>
+    <p class="sub">Each interactive is a self-contained <code>.html</code> file — inline CSS and JS, no external dependencies.</p>
+    <div class="file-tree"><span class="dir">my-interactives/</span>
+  README.md
+  index.html          <span class="cmnt">← landing page</span>
+  <span class="dir">demos/</span>
+    bubble-sort.html
+    tcp-explainer.html
+    compound-interest.html</div>
+    <div class="tip">Self-contained files are safest — nothing breaks when files move or the folder structure changes.</div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step" id="s4">
+    <h2>Commit and push to GitHub</h2>
+    <p class="sub">Save your changes and upload them with three commands. Repeat every time you update a file.</p>
+    <div class="code-block">git add .  <span class="comment"># stage all new/changed files</span><button class="copy-btn" onclick="cp(this,'git add .')">Copy</button></div>
+    <div class="code-block">git commit -m "Add interactive demos"  <span class="comment"># snapshot</span><button class="copy-btn" onclick="cp(this,'git commit -m "Add interactive demos"')">Copy</button></div>
+    <div class="code-block">git push origin main  <span class="comment"># upload to GitHub</span><button class="copy-btn" onclick="cp(this,'git push origin main')">Copy</button></div>
+    <div class="tip">After pushing, your files appear on github.com within seconds.</div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step" id="s5">
+    <h2>Enable GitHub Pages</h2>
+    <p class="sub">Turn your repo into a live website — free hosting, instant deploys on every push.</p>
+    <ol>
+      <li>On your repo page, click <strong>Settings</strong></li>
+      <li>Scroll to <strong>Pages</strong> in the left sidebar</li>
+      <li>Under <em>Source</em>, select <span class="badge badge-blue">Deploy from a branch</span></li>
+      <li>Choose branch: <code>main</code> &nbsp;/&nbsp; folder: <code>/ (root)</code></li>
+      <li>Click <strong>Save</strong></li>
+    </ol>
+    <div class="tip">After ~60 seconds your site is live at:<br><code>https://YOUR-USERNAME.github.io/my-interactives/</code><br>Use this URL in Coursera's iframe plugin.</div>
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prevBtn" onclick="go(-1)" disabled>← Previous</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn primary" id="nextBtn" onclick="go(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+const labels = ["Create account","New repo","Clone locally","Add files","Push to GitHub","Enable Pages"];
+const total = labels.length;
+let cur = 0;
+
+const pillsEl = document.getElementById('pills');
+const dotsEl = document.getElementById('dots');
+
+labels.forEach((l, i) => {
+  const p = document.createElement('button');
+  p.className = 'pill' + (i===0?' active':'');
+  p.textContent = (i+1)+'. '+l;
+  p.onclick = () => goTo(i);
+  pillsEl.appendChild(p);
+
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function goTo(n) {
+  document.getElementById('s'+cur).classList.remove('visible');
+  cur = n;
+  document.getElementById('s'+cur).classList.add('visible');
+  document.querySelectorAll('.pill').forEach((p,i) => p.classList.toggle('active', i===cur));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===cur));
+  document.getElementById('ctr').textContent = 'Step '+(cur+1)+' of '+total;
+  document.getElementById('prog').style.width = ((cur+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled = cur===0;
+  const nb = document.getElementById('nextBtn');
+  nb.textContent = cur===total-1 ? 'Done ✓' : 'Next →';
+  nb.disabled = cur===total-1;
+}
+
+function go(dir) { goTo(Math.max(0, Math.min(total-1, cur+dir))); }
+
+function cp(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+</script>
+</body>
+</html>
